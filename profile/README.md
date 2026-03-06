@@ -1,13 +1,14 @@
 <h1 align="center">
-  <strong>Krv Analytics</strong>
+  <img src="../logo-complete.png" alt="krv labs logo" height="150" />
+  <br/>
+  <strong>krv labs</strong>
 </h1>
 
 <p align="center">
-  <em>POSIX for AI integrations — a unified protocol layer that abstracts enterprise data complexity so AI systems deploy anywhere without migrations.</em>
+  <em>Clinical Trials for AI Models — preventing healthcare AI deployment disasters by rigorously stress-testing models before they reach patients.</em>
   <br/>
   <sub>
-    Krv lets companies turn private data and workflows into custom AI APIs — without moving or exposing their data.  
-    Powered by a hypergraph-based AI engine, Krv securely connects to existing systems, learns how they work, and instantly generates explainable, enterprise-ready AI capabilities that can optimize your business.
+    70% of healthcare AI models fail to reach production because they break under real-world conditions. krv labs bridges the gap between offline validation and clinical reality by stress-testing models against the chaos of actual hospital environments—missing data, workflow shifts, and population drift.
   </sub>
 </p>
 
@@ -16,7 +17,7 @@
     <img src="https://img.shields.io/badge/web-krv.ai-black?style=for-the-badge&logo=vercel">
   </a>
   <a href="https://www.linkedin.com/company/krv-analytics">
-    <img src="https://img.shields.io/badge/LinkedIn-Krv%20Analytics-blue?style=for-the-badge&logo=linkedin">
+    <img src="https://img.shields.io/badge/LinkedIn-krv%20labs-blue?style=for-the-badge&logo=linkedin">
   </a>
   <a href="mailto:team@krv.ai">
     <img src="https://img.shields.io/badge/Email-team@krv.ai-fe2b27?style=for-the-badge&logo=gmail">
@@ -25,41 +26,20 @@
 
 ---
 
-<details>
-<summary>We also like spending way too much time on viz 🤷</summary> <br/>
+### 🛠️ What We Do
 
-```mermaid
-%%{init: { 'theme': 'base', 'themeVariables': { 'git0': '#93a7c7', 'git1': '#d0d0d0', 'git2': '#e0e0e0', 'git3': '#f0f0f0', 'gitBranchLabel0': '#000000', 'gitBranchLabel1': '#000000', 'commitLabelColor': '#000000', 'commitLabelBackground': 'transparent', 'tagLabelColor': '#000000', 'tagLabelBackground': 'transparent', 'tagLabelBorder': 'transparent'}} }%%
-gitGraph TB:
-    commit id: "Enterprise Data Sources" tag: "SAP • ERP • Data Lakes"
-    commit id: "IoT & API Streams" tag: "Real-time"
+The **krv labs** platform subjects clinical AI models to thousands of realistic scenarios to identify failure modes that traditional metrics miss:
 
-    branch hypergraph-layer
-    commit id: "Hypergraph Compiler" tag: "Zero-copy"
-    commit id: "Unified Representation" tag: "Connect Silos"
-    commit id: "Semantic Playground" tag: "AI-Native"
-    commit id: "Policy-Aware Access" tag: "Enforce Org Security"
+*   **Resilience Testing:** Simulating EHR outages, missing labs (30%+), and sensor drift to ensure graceful degradation.
+*   **Stability Analysis:** Verifying that minor, clinically insignificant data shifts don't flip critical predictions.
+*   **Generalizability:** Stress-testing models across diverse age groups, ethnicities, and comorbidity combinations.
+*   **Sanity Checks:** Injecting impossible data and logic errors to ensure models catch nonsense instead of amplifying it.
 
+### 📈 Why It Matters
 
-    branch ai-reasoning
-    commit id: "Dynamic Data Curation" tag: "Context Aware Cleaning"
-    commit id: "Agentic Modeling" tag: "Lightweight Custom Models"
-    commit id: "Cloud-Native Training" tag: "Private Learning"
+Traditional validation uses clean, static datasets. Real hospitals are messy. We help teams ship trustworthy models in weeks—not months—by pinpointing exactly where and why a model will break in production.
 
-    checkout hypergraph-layer
-    merge ai-reasoning tag: "Integrated Enterprise Intelligence"
-
-    branch orchestration
-    commit id: "Natural Language Interface" tag: "Understand User Goals"
-    commit id: "Workflow Engine" tag: "Plan & Execute Tasks"
-    commit id: "Zero-Shot API Generator" tag: "Create Optimal Endpoints"
-
-    checkout main
-    merge hypergraph-layer tag: "Core Platform"
-    merge orchestration tag: "Iteration and Deployment"
-
-    commit id: "Deployed AI Solutions" tag: "Custom, Org-Specific APIs"
-    commit id: "Live Integration" tag: "No Data Migration"
-```
-
-</details>
+---
+<p align="center">
+  <em>Backed by NVIDIA Inception, Berkeley SkyDeck, PAD-13, and TUM Venture Labs.</em>
+</p>

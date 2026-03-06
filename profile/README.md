@@ -1,7 +1,6 @@
 <h1 align="center">
   <img src="../logo-complete.png" alt="krv labs logo" height="150" />
   <br/>
-  <strong>krv labs</strong>
 </h1>
 
 <p align="center">

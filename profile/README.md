@@ -2,8 +2,6 @@
 
 # Krv Labs
 
-**Clinical Trials for AI Models**
-
 <em>We prevent healthcare AI deployment disasters by rigorously stress-testing models<br/>before they ever reach a patient.</em>
 
 <br/>
@@ -38,16 +36,17 @@ Named for the giants who refused to accept good enough.<br/>
 <br/>
 Backed by
 <br/>
+<br/>
 
-<a href="https://www.nvidia.com/en-us/startups/">
+<a href="https://www.nvidia.com/en-us/startups/" style="display: inline-block; line-height: 0; background: #ffffff;">
   <img src="https://img.shields.io/badge/NVIDIA%20Inception-76B900?style=for-the-badge&logo=nvidia&logoColor=white" alt="NVIDIA Inception" />
 </a>
-&nbsp;
-<a href="https://skydeck.berkeley.edu/program/">
+<span> </span>
+<a href="https://skydeck.berkeley.edu/program/" style="display: inline-block; line-height: 0; background: #ffffff;">
   <img src="https://img.shields.io/badge/PAD--13-111111?style=for-the-badge" alt="PAD-13" />
 </a>
-&nbsp;
-<a href="https://www.tum-venture-labs.de/labs/healthcare/">
+<span> </span>
+<a href="https://www.tum-venture-labs.de/labs/healthcare/" style="display: inline-block; line-height: 0; background: #ffffff;">
   <img src="https://img.shields.io/badge/TUM%20Venture%20Labs-0065BD?style=for-the-badge" alt="TUM Venture Labs" />
 </a>
 

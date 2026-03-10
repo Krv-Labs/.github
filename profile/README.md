@@ -1,44 +1,61 @@
-<h1 align="center">
-  <img src="../logo-complete.png" alt="krv labs logo" height="150" />
-  <br/>
-</h1>
+<div align="center">
+  <img src="../krv-black.svg" alt="Krv Labs logo" width="180" />
+</div>
 
-<p align="center">
-  <em>Clinical Trials for AI Models — preventing healthcare AI deployment disasters by rigorously stress-testing models before they reach patients.</em>
-  <br/>
-  <sub>
-    70% of healthcare AI models fail to reach production because they break under real-world conditions. krv labs bridges the gap between offline validation and clinical reality by stress-testing models against the chaos of actual hospital environments—missing data, workflow shifts, and population drift.
-  </sub>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://krv.ai">
-    <img src="https://img.shields.io/badge/web-krv.ai-black?style=for-the-badge&logo=vercel">
-  </a>
-  <a href="https://www.linkedin.com/company/krv-analytics">
-    <img src="https://img.shields.io/badge/LinkedIn-krv%20labs-blue?style=for-the-badge&logo=linkedin">
-  </a>
-  <a href="mailto:team@krv.ai">
-    <img src="https://img.shields.io/badge/Email-team@krv.ai-fe2b27?style=for-the-badge&logo=gmail">
-  </a>
-</p>
+<div align="center">
 
----
+# Krv Labs
 
-### 🛠️ What We Do
+**Clinical Trials for AI Models**
 
-The **krv labs** platform subjects clinical AI models to thousands of realistic scenarios to identify failure modes that traditional metrics miss:
+<em>We prevent healthcare AI deployment disasters by rigorously stress-testing models<br/>before they ever reach a patient.</em>
 
-*   **Resilience Testing:** Simulating EHR outages, missing labs (30%+), and sensor drift to ensure graceful degradation.
-*   **Stability Analysis:** Verifying that minor, clinically insignificant data shifts don't flip critical predictions.
-*   **Generalizability:** Stress-testing models across diverse age groups, ethnicities, and comorbidity combinations.
-*   **Sanity Checks:** Injecting impossible data and logic errors to ensure models catch nonsense instead of amplifying it.
+<br/>
 
-### 📈 Why It Matters
+<a href="https://krv.ai">
+  <img src="https://img.shields.io/badge/krv.ai-000000?style=for-the-badge&logo=vercel&logoColor=white">
+</a>
+&nbsp;
+<a href="https://www.linkedin.com/company/krv-analytics">
+  <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white">
+</a>
+&nbsp;
+<a href="mailto:team@krv.ai">
+  <img src="https://img.shields.io/badge/team@krv.ai-EA4335?style=for-the-badge&logo=gmail&logoColor=white">
+</a>
 
-Traditional validation uses clean, static datasets. Real hospitals are messy. We help teams ship trustworthy models in weeks—not months—by pinpointing exactly where and why a model will break in production.
+</div>
 
 ---
-<p align="center">
-  <em>Backed by NVIDIA Inception, Berkeley SkyDeck, PAD-13, and TUM Venture Labs.</em>
-</p>
+
+<div align="center">
+<sub>
+Named for the giants who refused to accept good enough.<br/>
+<b>Kepler</b> mapped the heavens with equations.<br/>
+<b>Riemann</b> rebuilt the foundations of geometry.<br/>
+<b>Von Neumann</b> invented the machine that thinks.<br/><br/>
+<b>We bring that standard to clinical AI.</b>
+</sub>
+</div>
+
+<br/>
+
+_Backed by_
+
+<br/>
+
+<a href="https://www.nvidia.com/en-us/startups/">
+  <img src="https://img.shields.io/badge/NVIDIA%20Inception-76B900?style=for-the-badge&logo=nvidia&logoColor=white" alt="NVIDIA Inception" />
+</a>
+&nbsp;
+<a href="https://skydeck.berkeley.edu/program/">
+  <img src="https://img.shields.io/badge/PAD--13-111111?style=for-the-badge" alt="PAD-13" />
+</a>
+&nbsp;
+<a href="https://www.tum-venture-labs.de/labs/healthcare/">
+  <img src="https://img.shields.io/badge/TUM%20Venture%20Labs-0065BD?style=for-the-badge" alt="TUM Venture Labs" />
+</a>
+
+</div>

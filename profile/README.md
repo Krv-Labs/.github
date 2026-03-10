@@ -1,10 +1,4 @@
 <div align="center">
-  <img src="../krv-black.svg" alt="Krv Labs logo" width="180" />
-</div>
-
-<div align="center">
-
-<div align="center">
 
 # Krv Labs
 

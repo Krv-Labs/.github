@@ -9,11 +9,11 @@
 <a href="https://krv.ai">
   <img src="https://img.shields.io/badge/krv.ai-000000?style=for-the-badge&logo=vercel&logoColor=white">
 </a>
-&nbsp;
+<span> </span>
 <a href="https://www.linkedin.com/company/krv-analytics">
   <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white">
 </a>
-&nbsp;
+<span> </span>
 <a href="mailto:team@krv.ai">
   <img src="https://img.shields.io/badge/team@krv.ai-EA4335?style=for-the-badge&logo=gmail&logoColor=white">
 </a>

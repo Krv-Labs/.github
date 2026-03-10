@@ -34,10 +34,9 @@ Named for the giants who refused to accept good enough.<br/>
 </sub>
 </div>
 
+<div align="center">
 <br/>
-
-_Backed by_
-
+Backed by
 <br/>
 
 <a href="https://www.nvidia.com/en-us/startups/">

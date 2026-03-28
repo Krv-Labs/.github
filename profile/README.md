@@ -13,7 +13,7 @@ Our first project began with Riemannian curvature. Today, we honor the lineage o
 
 ### Partners & Affiliations
 [![NVIDIA Inception](https://img.shields.io/badge/NVIDIA%20Inception-76B900?style=for-the-badge&logo=nvidia&logoColor=white)](https://www.nvidia.com/en-us/startups/)
-[![Berkeley SkyDeck PAD-13](https://img.shields.io/badge/Berkeley--SkyDeck-003262?style=for-the-badge&logo=universityofcaliforniaberkeley&logoColor=white)](https://skydeck.berkeley.edu/program/)
+[![Berkeley SkyDeck PAD-13](https://img.shields.io/badge/Berkeley%20SkyDeck-003262?style=for-the-badge&logo=universityofcaliforniaberkeley&logoColor=white)](https://skydeck.berkeley.edu/program/)
 [![TUM Venture Labs](https://img.shields.io/badge/TUM%20Venture%20Labs-3070B3?style=for-the-badge)](https://www.tum-venture-labs.de/labs/healthcare/)
 
 ### Connect with us

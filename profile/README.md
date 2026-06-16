@@ -1,13 +1,13 @@
 # krv
-> **Preventing healthcare AI disasters through rigorous stress-testing.**
+> **Evaluations for agentic systems, grounded in mathematics**
 
-Our first project began with Riemannian curvature. Today, we honor the lineage of the giants who refused to accept "good enough."
+Our first project featured Riemannian curvature. Today, Krv Labs is built honor the lineage of giants who refused to accept "good enough."
 
 * **Kepler** mapped the heavens with equations.
 * **Riemann** rebuilt the foundations of geometry.
 * **Von Neumann** codified the architecture of logic.
 
-### We bring that standard to the evaluation and architecture of clinical AI.
+### We bring that standard to agentic evaluation.
 
 ---
 

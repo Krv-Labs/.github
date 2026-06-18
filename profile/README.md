@@ -1,7 +1,7 @@
 # krv
 > **Evaluations for agentic systems, grounded in mathematics**
 
-Our first project featured Riemannian curvature. Today, Krv Labs is built honor the lineage of giants who refused to accept "good enough."
+Our first project featured Riemannian curvature. Today, Krv Labs is built to honor the lineage of giants who refused to accept "good enough."
 
 * **Kepler** mapped the heavens with equations.
 * **Riemann** rebuilt the foundations of geometry.

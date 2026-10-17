@@ -10,15 +10,6 @@ Krv Labs builds models that learn informative representations of patient data, a
 
 Our methods are grounded in geometry and topology. We bring the rigor of Kepler, Riemann and von Neumann to clinical research.
 
-### Open source
-| Project | What it does |
-|---|---|
-| [**trailed**](https://github.com/Krv-Labs/trailed) | Topological regularization and integrity learning for EHR data |
-| [**phil**](https://github.com/Krv-Labs/phil) | Multiverse imputation for missing data, powered by topology |
-| [**pulsar**](https://github.com/Krv-Labs/pulsar) | Fast multiverse exploration of data representations |
-| [**Thema**](https://github.com/Krv-Labs/Thema) | Topological hyperparameter evaluation for choosing representations |
-| [**pasteur**](https://github.com/Krv-Labs/pasteur) | Stress-testing toolkit for clinical AI |
-
 ---
 
 ### Partners & Affiliations

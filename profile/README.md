@@ -15,7 +15,7 @@ Our first project featured Riemannian curvature. Today, Krv Labs is built to hon
 * **Riemann** rebuilt the foundations of geometry.
 * **Von Neumann** codified the architecture of logic.
 
-**We bring that standard to healthcare AI.**
+**We bring that standard to the world of clinical trials.**
 
 ---
 

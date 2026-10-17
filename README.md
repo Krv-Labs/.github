@@ -29,7 +29,7 @@
 *   **Local intelligence:** inference runs inside the hospital or on the researcher's machine, not in someone else's cloud.
 *   **Privacy first:** patient data never has to leave the institution to be useful.
 
-Krv stands for **K**epler, **R**iemann and **v**on Neumann. Krv Labs is built to honor the lineage of giants who refused to accept "good enough," and we bring their standard of rigor to clinical research.
+Krv stands for **K**epler, **R**iemann and **v**on Neumann. Krv Labs is built to honor the lineage of giants who refused to accept "good enough," and we bring that standard to healthcare AI.
 
 ### 📁 About This Repository
 

@@ -9,7 +9,13 @@ Krv Labs builds models that learn informative representations of patient data, a
 * **Privacy first:** patient data never has to leave the institution to be useful.
 
 ### The name
-Krv stands for **K**epler, **R**iemann and **v**on Neumann: Kepler, who mapped the heavens with equations; Riemann, who rebuilt the foundations of geometry; and von Neumann, who formalized the architecture of computation. Krv Labs is built to honor the lineage of giants who refused to accept "good enough," and we bring that standard of rigor to clinical research.
+Our first project featured Riemannian curvature. Today, Krv Labs is built to honor the lineage of giants who refused to accept "good enough."
+
+* **Kepler** mapped the heavens with equations.
+* **Riemann** rebuilt the foundations of geometry.
+* **Von Neumann** codified the architecture of logic.
+
+**We bring that standard to healthcare AI.**
 
 ---
 

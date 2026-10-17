@@ -1,5 +1,5 @@
 # krv
-> **Privacy-first AI for clinical trials and research**
+> **Clinical Trial Intelligence**
 
 Krv Labs builds models that learn informative representations of patient data, and runs them where that data lives. The goal: help researchers find the right patients, design better trials and generate clinical knowledge without moving sensitive records.
 

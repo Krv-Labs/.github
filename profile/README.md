@@ -1,13 +1,21 @@
 # krv
-> **Evaluations for agentic systems, grounded in mathematics**
+> **Clinical Trial Intelligence**
 
+Krv Labs builds models that learn informative representations of patient data, and runs them where that data lives. The goal: help researchers find the right patients, design better trials and generate clinical knowledge without moving sensitive records.
+
+* **Foundation models:** learn representations of the patient journey (labs, medications, diagnoses, encounters over time) that transfer across diseases, sites and studies.
+* **Decision models:** turn those representations into calibrated, interpretable decisions, such as who is eligible, which cohort to study and what is likely to happen next.
+* **Local intelligence:** inference runs inside the hospital or on the researcher's machine, not in someone else's cloud.
+* **Privacy first:** patient data never has to leave the institution to be useful.
+
+### The name
 Our first project featured Riemannian curvature. Today, Krv Labs is built to honor the lineage of giants who refused to accept "good enough."
 
 * **Kepler** mapped the heavens with equations.
 * **Riemann** rebuilt the foundations of geometry.
 * **Von Neumann** codified the architecture of logic.
 
-### We bring that standard to agentic evaluation.
+**We bring that standard to the world of clinical trials.**
 
 ---
 

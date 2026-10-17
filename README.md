@@ -1,14 +1,10 @@
-<h1 align="center">
-  <img src="logo-complete.png" alt="krv labs logo" height="150" />
-  <br/>
-  <strong>krv labs</strong>
-</h1>
+<h1 align="center">krv labs</h1>
 
 <p align="center">
-  <em>Clinical Trials for AI Models — preventing healthcare AI deployment disasters by rigorously stress-testing models before they reach patients.</em>
+  <em>Privacy-first AI for clinical trials and research.</em>
   <br/>
   <sub>
-    70% of healthcare AI models fail to reach production because they break under real-world conditions. krv labs bridges the gap between offline validation and clinical reality by stress-testing models against the chaos of actual hospital environments—missing data, workflow shifts, and population drift.
+    We build models that learn informative representations of patient data, and run them where that data lives, so researchers can find the right patients, design better trials and generate clinical knowledge without moving sensitive records.
   </sub>
 </p>
 
@@ -26,18 +22,24 @@
 
 ---
 
-### 🛠️ What We Do
+### 🧬 What We Do
 
-The **krv labs** platform subjects clinical AI models to thousands of realistic scenarios to identify failure modes that traditional metrics miss:
+*   **Foundation models:** representations of the patient journey (labs, medications, diagnoses, encounters over time) that transfer across diseases, sites and studies.
+*   **Decision models:** calibrated, interpretable decisions built on those representations, such as who is eligible, which cohort to study and what is likely to happen next.
+*   **Local intelligence:** inference runs inside the hospital or on the researcher's machine, not in someone else's cloud.
+*   **Privacy first:** patient data never has to leave the institution to be useful.
 
-*   **Resilience Testing:** Simulating EHR outages, missing labs (30%+), and sensor drift to ensure graceful degradation.
-*   **Stability Analysis:** Verifying that minor, clinically insignificant data shifts don't flip critical predictions.
-*   **Generalizability:** Stress-testing models across diverse age groups, ethnicities, and comorbidity combinations.
-*   **Sanity Checks:** Injecting impossible data and logic errors to ensure models catch nonsense instead of amplifying it.
+Krv stands for **K**epler, **R**iemann and **v**on Neumann. Krv Labs is built to honor the lineage of giants who refused to accept "good enough," and we bring that standard to healthcare AI.
 
-### 📈 Why It Matters
+### 📁 About This Repository
 
-Traditional validation uses clean, static datasets. Real hospitals are messy. We help teams ship trustworthy models in weeks—not months—by pinpointing exactly where and why a model will break in production.
+This is the organization's shared `.github` repository:
+
+*   [`profile/README.md`](profile/README.md): the public profile shown at [github.com/Krv-Labs](https://github.com/Krv-Labs)
+*   [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE): default issue templates for all org repositories
+*   [`.github/workflows/`](.github/workflows): reusable GCP build, deploy and PR staging workflows
+*   [`templates/`](templates): starter `Dockerfile` and `cloudbuild.yaml`
+*   [`docs/`](docs): CI/CD setup guides (Workload Identity Federation, staging environments)
 
 ---
 <p align="center">

@@ -8,7 +8,8 @@ Krv Labs builds models that learn informative representations of patient data, a
 * **Local intelligence:** inference runs inside the hospital or on the researcher's machine, not in someone else's cloud.
 * **Privacy first:** patient data never has to leave the institution to be useful.
 
-Our methods are grounded in geometry and topology. We bring the rigor of Kepler, Riemann and von Neumann to clinical research.
+### The name
+Krv stands for **K**epler, **R**iemann and **v**on Neumann: Kepler, who mapped the heavens with equations; Riemann, who rebuilt the foundations of geometry; and von Neumann, who formalized the architecture of computation. Our methods are grounded in geometry and topology, and we bring that standard of rigor to clinical research.
 
 ---
 

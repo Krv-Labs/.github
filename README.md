@@ -29,7 +29,7 @@
 *   **Local intelligence:** inference runs inside the hospital or on the researcher's machine, not in someone else's cloud.
 *   **Privacy first:** patient data never has to leave the institution to be useful.
 
-Our methods are grounded in geometry and topology. See our [open-source projects](https://github.com/Krv-Labs).
+Krv stands for **K**epler, **R**iemann and **v**on Neumann. Our methods are grounded in geometry and topology, and we bring their standard of rigor to clinical research.
 
 ### 📁 About This Repository
 

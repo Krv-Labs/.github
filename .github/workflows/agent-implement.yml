@@ -74,6 +74,7 @@ jobs:
             - Add or update tests for any logic you change, and run the repo's tests if you can.
             - Never edit .github/, secrets, CI or deploy config. Never put patient data or credentials in code, tests or logs.
             - If the task is unclear or too large for one PR, change nothing and explain why.
+            - Only edit files. Do not run git (no commit, branch or push): the workflow commits your changes.
             Finish with a PR description in Markdown with these sections: Summary, Testing (commands you ran
             and their result, or why you could not), Risk (low/med/high and why), How to revert.
 
@@ -86,7 +87,10 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           rm -f .krv-issue.md
-          if [ -z "$(git status --porcelain)" ]; then
+          # Stage real changes only; test runs and installs leave build junk behind.
+          git add -A -- . ':!**/__pycache__/**' ':!**/*.pyc' ':!**/node_modules/**' ':!**/.pytest_cache/**' \
+                          ':!**/target/**' ':!**/dist/**' ':!**/.next/**' ':!**/.turbo/**'
+          if git diff --cached --quiet; then
             gh issue comment "$N" -R "$REPO" --body "🤖 The agent made no changes. Its notes:"$'\n\n'"$RESULT"
             gh issue edit "$N" -R "$REPO" --remove-label agent:go
             exit 0
@@ -95,7 +99,6 @@ jobs:
           git config user.name "krv-agent[bot]"
           git config user.email "krv-agent[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add -A
           git commit -q -m "Agent: implement #$N" -m "Directed by @$ACTOR"
           git push -q --force "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "$branch"
           reviewers=$(gh issue view "$N" -R "$REPO" --json assignees --jq '[.assignees[].login] | join(",")')

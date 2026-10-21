@@ -40,6 +40,7 @@ jobs:
       review: ${{ steps.changes.outputs.review }}
       round: ${{ steps.prev.outputs.round }}
       result: ${{ steps.codex.outputs.final-message }}
+      topos: ${{ steps.quality.outputs.topos }}
       repo: ${{ steps.pr.outputs.repo }}
       number: ${{ steps.pr.outputs.number }}
       head: ${{ steps.pr.outputs.head }}
@@ -122,6 +123,37 @@ jobs:
         if: steps.changes.outputs.review == 'true'
         run: cp "$RUNNER_TEMP/pr.md" .krv-pr.md
 
+      # Quality signals: Topos structural before/after (our own metric) and the Art Bin
+      # smell catalog for the changed languages. Pinned; any failure degrades to "unavailable".
+      - id: quality
+        name: Topos + Art Bin
+        if: steps.changes.outputs.review == 'true'
+        continue-on-error: true
+        env:
+          BASE: ${{ steps.pr.outputs.base }}
+          HEAD: ${{ steps.pr.outputs.head }}
+          TOPOS_VERSION: v0.12.0
+          ART_BIN_SHA: 9dcfc0fd9861108782a024a24b0f6e03e7c498b1
+        run: |
+          echo "Topos unavailable." > .krv-topos.md
+          t="$RUNNER_TEMP/topos"; mkdir -p "$t"; rel="https://github.com/Krv-Labs/topos/releases/download/$TOPOS_VERSION"
+          if curl -fsSL -o "$t/topos-linux-amd64" "$rel/topos-linux-amd64" && curl -fsSL -o "$t/checksums.txt" "$rel/checksums.txt" \
+             && (cd "$t" && grep ' topos-linux-amd64$' checksums.txt | sha256sum -c -); then
+            chmod +x "$t/topos-linux-amd64"
+            timeout 600 "$t/topos-linux-amd64" pr-recap --base "$BASE" --head "$HEAD" --format github --info --no-coupling --no-input \
+              > .krv-topos.md 2> "$t/err" || echo "Topos unavailable: $(tail -1 "$t/err")" > .krv-topos.md
+          fi
+          { echo 'topos<<KRV_EOF'; head -c 20000 .krv-topos.md; echo; echo KRV_EOF; } >> "$GITHUB_OUTPUT"
+
+          a="$RUNNER_TEMP/art-bin"; mkdir -p .krv-art-bin
+          git clone -q https://github.com/Krv-Labs/the-art-bin.git "$a" && git -C "$a" checkout -q "$ART_BIN_SHA"
+          langs=$(git diff --name-only "$BASE...$HEAD" | sed -nE 's/.*\.rs$/rust/p; s/.*\.(tsx?|jsx?|mjs|cjs)$/typescript/p; s/.*\.py$/python/p' | sort -u)
+          for l in $langs; do
+            jq -c --arg l "$l" '(if type == "array" then .[] else .smells[] end) | select(.language == $l) | {id, severity, category, signature}' \
+              "$a/catalog.json" >> .krv-art-bin/catalog.jsonl
+            cp -r "$a/snippets/$l" ".krv-art-bin/$l"
+          done
+
       - id: codex
         if: steps.changes.outputs.review == 'true'
         uses: openai/codex-action@v1
@@ -136,7 +168,7 @@ jobs:
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["risk", "risk_reason", "summary", "findings"],
+              "required": ["risk", "risk_reason", "summary", "findings", "quality"],
               "properties": {
                 "risk": {"type": "string", "enum": ["low", "med", "high"]},
                 "risk_reason": {"type": "string"},
@@ -153,6 +185,21 @@ jobs:
                       "line": {"type": "integer"},
                       "title": {"type": "string"},
                       "detail": {"type": "string"}
+                    }
+                  }
+                },
+                "quality": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["title", "file", "line", "source", "suggestion"],
+                    "properties": {
+                      "title": {"type": "string"},
+                      "file": {"type": "string"},
+                      "line": {"type": "integer"},
+                      "source": {"type": "string"},
+                      "suggestion": {"type": "string"}
                     }
                   }
                 }
@@ -181,6 +228,16 @@ jobs:
             Fixed for a finding from the previous review that this push resolved.
             If there is nothing to fix, return an empty findings list and say so in the summary.
 
+            Quality (never blocks merge): .krv-topos.md is Topos's structural before/after for this change
+            (Krv's own metric; skip it if it says "unavailable"). .krv-art-bin/catalog.jsonl lists code smells
+            for the changed languages; the full entry for a smell is .krv-art-bin/<language>/code/<id>.md
+            (or .../architecture/<id>.md). Shortlist only smells that plausibly match the changed code, read
+            each one's `distinguish` line before citing it (it describes the legitimate look-alike) and never
+            flag code that fits that case. Return at most 3 `quality` items: the most necessary structural
+            changes, ranked, each with file:line, a `source` ("art-bin:<id> (<severity>)" or "topos: <signal>")
+            and a concrete suggestion. Severity `taste` is a preference, not a defect. Real bugs go in findings,
+            not quality. Return an empty list when nothing is worth changing.
+
             Classify risk by what the change touches, not by who wrote it:
             - high: .github/workflows, CI/release/deploy config, infra (Terraform, Helm, Cloud Run),
               DB migrations, auth/session, PHI vault/keystore/gateway policy, licence signing,
@@ -206,6 +263,7 @@ jobs:
       - uses: actions/github-script@v7
         env:
           RESULT: ${{ needs.review.outputs.result }}
+          TOPOS: ${{ needs.review.outputs.topos }}
           ROUND: ${{ needs.review.outputs.round }}
           REPO: ${{ needs.review.outputs.repo }}
           NUM: ${{ needs.review.outputs.number }}
@@ -220,10 +278,14 @@ jobs:
             const [owner, repo] = process.env.REPO.split('/');
             const important = r.findings.filter(f => f.severity === 'Important');
             const lines = r.findings.map(f => `- **${f.severity}** \`${f.file}:${f.line}\` — ${f.title}\n  ${f.detail}`);
+            const quality = (r.quality || []).map((q, i) => `${i + 1}. \`${q.file}:${q.line}\` — **${q.title}** _(${q.source})_\n   ${q.suggestion}`);
+            const topos = (process.env.TOPOS || '').trim();
             const body = [
               `<!-- krv-ai-review round=${round} sha=${head} -->`,
               `### 🤖 AI review (round ${round}, ${head.slice(0, 7)}) — ${r.findings.length} finding(s), ${important.length} important · risk: **${r.risk}**`,
               '', r.summary, '', `_Risk: ${r.risk_reason}_`, '', ...lines, '',
+              ...(quality.length ? ['#### Quality suggestions (Topos + Art Bin)', ...quality, ''] : []),
+              ...(topos && !topos.startsWith('Topos unavailable') ? ['<details><summary>Topos structural recap</summary>', '', topos, '', '</details>', ''] : []),
               '<sub>Fix each Important finding or reply with why it does not apply. Bot approvals never count as human review.</sub>',
             ].join('\n');
 

@@ -54,6 +54,7 @@ jobs:
           openai-api-key: ${{ secrets.AZURE_OPENAI_API_KEY }}
           responses-api-endpoint: https://krv-ai-review-eus2.openai.azure.com/openai/v1/responses
           model: ${{ inputs.model }}
+          effort: low
           permission-profile: ":workspace"
           allow-bot-users: krv-agent[bot] # meeting-todos labels clear tasks agent:go itself
           prompt: |

@@ -102,7 +102,7 @@ jobs:
                     "additionalProperties": false,
                     "required": ["severity", "file", "line", "title", "detail"],
                     "properties": {
-                      "severity": {"type": "string", "enum": ["Important", "Nit", "Pre-existing"]},
+                      "severity": {"type": "string", "enum": ["Important", "Nit", "Pre-existing", "Fixed"]},
                       "file": {"type": "string"},
                       "line": {"type": "integer"},
                       "title": {"type": "string"},
@@ -131,7 +131,8 @@ jobs:
             - tests that no longer test what they claim.
             Do not report style, naming or formatting. Every finding needs a file and line from the diff
             and a concrete failure scenario. Use severity Important for anything that should block merge,
-            Nit for small non-blocking issues (at most 3), Pre-existing for bugs in old code you noticed.
+            Nit for small non-blocking issues (at most 3), Pre-existing for bugs in old code you noticed,
+            Fixed for a finding from the previous review that this push resolved.
             If there is nothing to fix, return an empty findings list and say so in the summary.
 
             Classify risk by what the change touches, not by who wrote it:

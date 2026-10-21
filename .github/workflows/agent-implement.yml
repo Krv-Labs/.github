@@ -14,6 +14,9 @@ on:
       setup-command:
         type: string
         default: "" # e.g. "pip install -r requirements.txt"; Codex itself has no network
+      node-version:
+        type: string
+        default: "" # e.g. "24" for Node repos; corepack then provides the repo's pnpm/yarn
     secrets:
       AZURE_OPENAI_API_KEY:
         required: true
@@ -43,6 +46,11 @@ jobs:
           TITLE: ${{ github.event.issue.title }}
           BODY: ${{ github.event.issue.body }}
         run: printf '# %s\n\n%s\n' "$TITLE" "$BODY" > .krv-issue.md
+
+      - if: inputs.node-version != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
 
       - name: Setup
         if: inputs.setup-command != ''

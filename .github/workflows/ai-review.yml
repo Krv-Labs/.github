@@ -29,7 +29,7 @@ on:
 jobs:
   review:
     if: inputs.pr != 0 || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # ponytail: codex-action drop-sudo fails on 26.04 (openai/codex-action#188); back to ubuntu-latest once fixed
     concurrency:
       group: ai-review-${{ inputs.repo || github.repository }}-${{ inputs.pr || github.event.pull_request.number }}
       cancel-in-progress: true

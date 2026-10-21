@@ -26,7 +26,7 @@ on:
 jobs:
   implement:
     if: github.event.label.name == 'agent:go'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # ponytail: codex-action drop-sudo fails on 26.04 (openai/codex-action#188); back to ubuntu-latest once fixed
     permissions:
       contents: read
     steps:

@@ -10,7 +10,7 @@ on:
     inputs:
       model:
         type: string
-        default: gpt-5-mini # ponytail: switch to gpt-5.3-codex once Azure quota lands
+        default: "" # empty = org var KRV_AGENT_MODEL, else gpt-5-mini (set to gpt-5.3-codex or gpt-6.1-sol once quota lands)
       setup-command:
         type: string
         default: "" # e.g. "pip install -r requirements.txt"; Codex itself has no network
@@ -66,8 +66,8 @@ jobs:
         with:
           openai-api-key: ${{ secrets.AZURE_OPENAI_API_KEY }}
           responses-api-endpoint: https://krv-ai-review-eus2.openai.azure.com/openai/v1/responses
-          model: ${{ inputs.model }}
-          effort: low
+          model: ${{ inputs.model || vars.KRV_AGENT_MODEL || 'gpt-5-mini' }}
+          effort: medium # low over-built on sandbox #5 (string unit parsing)
           permission-profile: ":workspace"
           allow-bot-users: krv-agent[bot] # meeting-todos labels clear tasks agent:go itself
           prompt: |

@@ -5,6 +5,8 @@ name: 🤖 AI review (reusable)
 # an Important finding. Callers: on pull_request [opened, synchronize, reopened,
 # ready_for_review]. Policy: kos "Engineering Review & Ownership Plan".
 # Skips lockfile/generated-only diffs. From round 4 on it re-reviews only the new commits.
+# On demand: pass `repo` + `pr` (from a private repo's workflow_dispatch) to review any org PR;
+# the krv-agent App then reads the PR and posts the comment.
 
 on:
   workflow_call:
@@ -12,16 +14,24 @@ on:
       model:
         type: string
         default: gpt-5-mini # ponytail: switch to gpt-6.1-sol / gpt-5.3-codex once Azure quota lands
+      repo:
+        type: string
+        default: "" # owner/name; empty = the PR that triggered the caller
+      pr:
+        type: number
+        default: 0
     secrets:
       AZURE_OPENAI_API_KEY:
         required: true
+      KRV_AGENT_PRIVATE_KEY:
+        required: false # only for on-demand reviews of another repo
 
 jobs:
   review:
-    if: github.event.pull_request.draft == false
+    if: inputs.pr != 0 || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     concurrency:
-      group: ai-review-${{ github.repository }}-${{ github.event.pull_request.number }}
+      group: ai-review-${{ inputs.repo || github.repository }}-${{ inputs.pr || github.event.pull_request.number }}
       cancel-in-progress: true
     permissions:
       contents: read
@@ -30,18 +40,50 @@ jobs:
       review: ${{ steps.changes.outputs.review }}
       round: ${{ steps.prev.outputs.round }}
       result: ${{ steps.codex.outputs.final-message }}
+      repo: ${{ steps.pr.outputs.repo }}
+      number: ${{ steps.pr.outputs.number }}
+      head: ${{ steps.pr.outputs.head }}
     steps:
+      - id: app
+        if: inputs.repo != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.KRV_AGENT_APP_ID }}
+          private-key: ${{ secrets.KRV_AGENT_PRIVATE_KEY }}
+          owner: Krv-Labs
+
+      # The PR under review: the triggering PR, or inputs.repo#inputs.pr when run on demand.
+      - id: pr
+        uses: actions/github-script@v7
+        env:
+          REPO_IN: ${{ inputs.repo }}
+          PR_IN: ${{ inputs.pr }}
+        with:
+          github-token: ${{ steps.app.outputs.token || github.token }}
+          script: |
+            const full = process.env.REPO_IN || `${context.repo.owner}/${context.repo.repo}`;
+            const [owner, repo] = full.split('/');
+            const n = Number(process.env.PR_IN);
+            const pr = n ? (await github.rest.pulls.get({ owner, repo, pull_number: n })).data : context.payload.pull_request;
+            core.setOutput('repo', full);
+            core.setOutput('number', pr.number);
+            core.setOutput('base', pr.base.sha);
+            core.setOutput('head', pr.head.sha);
+            require('fs').writeFileSync(`${process.env.RUNNER_TEMP}/pr.md`, `# ${pr.title}\n\n${pr.body || ''}\n`);
+
       - uses: actions/checkout@v5
         with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          repository: ${{ steps.pr.outputs.repo }}
+          ref: refs/pull/${{ steps.pr.outputs.number }}/merge
+          token: ${{ steps.app.outputs.token || github.token }}
           persist-credentials: false
           fetch-depth: 0
 
       - id: changes
         name: Skip lockfile/generated-only diffs
         env:
-          BASE: ${{ github.event.pull_request.base.sha }}
-          HEAD: ${{ github.event.pull_request.head.sha }}
+          BASE: ${{ steps.pr.outputs.base }}
+          HEAD: ${{ steps.pr.outputs.head }}
         run: |
           other=$(git diff --name-only "$BASE...$HEAD" \
             | grep -vE '(^|/)(pnpm-lock\.yaml|package-lock\.json|[^/]*\.lock)$|(^|/)(dist|build|generated)/' || true)
@@ -51,11 +93,18 @@ jobs:
       - id: prev
         if: steps.changes.outputs.review == 'true'
         uses: actions/github-script@v7
+        env:
+          REPO: ${{ steps.pr.outputs.repo }}
+          NUM: ${{ steps.pr.outputs.number }}
+          BASE: ${{ steps.pr.outputs.base }}
+          HEAD: ${{ steps.pr.outputs.head }}
         with:
+          github-token: ${{ steps.app.outputs.token || github.token }}
           script: |
             const fs = require('fs');
-            const pr = context.payload.pull_request;
-            const comments = await github.paginate(github.rest.issues.listComments, { ...context.repo, issue_number: pr.number });
+            const [owner, repo] = process.env.REPO.split('/');
+            const pr = { number: Number(process.env.NUM), head: { sha: process.env.HEAD }, base: { sha: process.env.BASE } };
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number });
             const mine = comments.find(c => c.user.type === 'Bot' && c.body.startsWith('<!-- krv-ai-review'));
             const round = mine ? Number((mine.body.match(/round=(\d+)/) || [, 1])[1]) : 0;
             const last = mine && (mine.body.match(/sha=([0-9a-f]{40})/) || [])[1];
@@ -71,10 +120,7 @@ jobs:
       # PR text is untrusted: hand it to the model as a file, never inline in the prompt.
       - name: Write PR context
         if: steps.changes.outputs.review == 'true'
-        env:
-          TITLE: ${{ github.event.pull_request.title }}
-          BODY: ${{ github.event.pull_request.body }}
-        run: printf '# %s\n\n%s\n' "$TITLE" "$BODY" > .krv-pr.md
+        run: cp "$RUNNER_TEMP/pr.md" .krv-pr.md
 
       - id: codex
         if: steps.changes.outputs.review == 'true'
@@ -113,7 +159,7 @@ jobs:
               }
             }
           prompt: |
-            You are reviewing pull request #${{ github.event.pull_request.number }} in ${{ github.repository }}.
+            You are reviewing pull request #${{ steps.pr.outputs.number }} in ${{ steps.pr.outputs.repo }}.
             ${{ steps.prev.outputs.scope }}
             Read it, and read surrounding code as needed. First read REVIEW.md, CLAUDE.md and AGENTS.md if they exist:
             they say what failure looks like in this repo and which paths to skip.
@@ -150,17 +196,28 @@ jobs:
       pull-requests: write
       issues: write
     steps:
+      - id: app
+        if: inputs.repo != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.KRV_AGENT_APP_ID }}
+          private-key: ${{ secrets.KRV_AGENT_PRIVATE_KEY }}
+          owner: Krv-Labs
       - uses: actions/github-script@v7
         env:
           RESULT: ${{ needs.review.outputs.result }}
           ROUND: ${{ needs.review.outputs.round }}
+          REPO: ${{ needs.review.outputs.repo }}
+          NUM: ${{ needs.review.outputs.number }}
+          HEAD: ${{ needs.review.outputs.head }}
         with:
+          github-token: ${{ steps.app.outputs.token || github.token }}
           script: |
             const r = JSON.parse(process.env.RESULT);
             const round = Number(process.env.ROUND) + 1;
-            const pr = context.payload.pull_request.number;
-            const head = context.payload.pull_request.head.sha;
-            const { owner, repo } = context.repo;
+            const pr = Number(process.env.NUM);
+            const head = process.env.HEAD;
+            const [owner, repo] = process.env.REPO.split('/');
             const important = r.findings.filter(f => f.severity === 'Important');
             const lines = r.findings.map(f => `- **${f.severity}** \`${f.file}:${f.line}\` — ${f.title}\n  ${f.detail}`);
             const body = [

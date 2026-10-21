@@ -7,6 +7,9 @@ name: 🤖 AI review (reusable)
 # Skips lockfile/generated-only diffs. From round 4 on it re-reviews only the new commits.
 # On demand: pass `repo` + `pr` (from a private repo's workflow_dispatch) to review any org PR;
 # the krv-agent App then reads the PR and posts the comment.
+# Slack: risk:high or an Important finding pings org var SLACK_REVIEW_CHANNEL. Callers opt in with
+#   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+# under `secrets:`; without it (or while the secret is empty) nothing is sent.
 
 on:
   workflow_call:
@@ -25,6 +28,8 @@ on:
         required: true
       KRV_AGENT_PRIVATE_KEY:
         required: false # only for on-demand reviews of another repo
+      SLACK_BOT_TOKEN:
+        required: false # xoxb; empty = no Slack ping
 
 jobs:
   review:
@@ -312,6 +317,8 @@ jobs:
           REPO: ${{ needs.review.outputs.repo }}
           NUM: ${{ needs.review.outputs.number }}
           HEAD: ${{ needs.review.outputs.head }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ vars.SLACK_REVIEW_CHANNEL }}
         with:
           github-token: ${{ steps.app.outputs.token || github.token }}
           script: |
@@ -335,8 +342,9 @@ jobs:
 
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr });
             const mine = comments.find(c => c.user.type === 'Bot' && c.body.startsWith('<!-- krv-ai-review'));
-            if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
-            else await github.rest.issues.createComment({ owner, repo, issue_number: pr, body });
+            const posted = mine
+              ? await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body })
+              : await github.rest.issues.createComment({ owner, repo, issue_number: pr, body });
 
             const colors = { low: '0e8a16', med: 'fbca04', high: 'd93f0b' };
             for (const level of Object.keys(colors)) {
@@ -345,5 +353,31 @@ jobs:
               if (level !== r.risk) { try { await github.rest.issues.removeLabel({ owner, repo, issue_number: pr, name }); } catch {} }
             }
             await github.rest.issues.addLabels({ owner, repo, issue_number: pr, labels: [`risk:${r.risk}`] });
+
+            // Slack ping for risk:high / Important. Here (not a curl step) because setFailed below would skip a later step.
+            // Who: requested reviewers (the area owner on agent PRs), else the PR author. Never blocks the review.
+            const token = process.env.SLACK_BOT_TOKEN;
+            if (token && process.env.SLACK_CHANNEL && (r.risk === 'high' || important.length)) {
+              try {
+                const auth = { Authorization: `Bearer ${token}` };
+                const emails = { eigensoup: 'stu@krv.ai', sgathrid: 'sidney@krv.ai', 'jeremy-wayland': 'jeremy@krv.ai' };
+                const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const p = (await github.rest.pulls.get({ owner, repo, pull_number: pr })).data;
+                const logins = p.requested_reviewers.length ? p.requested_reviewers.map(u => u.login) : [p.user.login];
+                const who = [];
+                for (const login of logins) {
+                  const u = emails[login] && await (await fetch(
+                    `https://slack.com/api/users.lookupByEmail?email=${encodeURIComponent(emails[login])}`, { headers: auth })).json();
+                  who.push(u && u.ok ? `<@${u.user.id}>` : login);
+                }
+                const text = `🔴 <${posted.data.html_url}|${process.env.REPO}#${pr} ${esc(p.title)}>: ` +
+                  `${important.length} Important · risk:${r.risk} → ${who.join(' ')}`;
+                const res = await (await fetch('https://slack.com/api/chat.postMessage', {
+                  method: 'POST', headers: { ...auth, 'Content-Type': 'application/json; charset=utf-8' },
+                  body: JSON.stringify({ channel: process.env.SLACK_CHANNEL, text, unfurl_links: false }),
+                })).json();
+                if (!res.ok) core.warning(`Slack: ${res.error}`);
+              } catch (e) { core.warning(`Slack ping failed: ${e.message}`); }
+            }
 
             if (important.length) core.setFailed(`${important.length} Important finding(s) — see the AI review comment.`);

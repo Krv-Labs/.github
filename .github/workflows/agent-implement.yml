@@ -4,6 +4,9 @@ name: 🛠️ Agent implement (reusable)
 # it and the krv-agent GitHub App opens a PR "Closes #N". The PR then goes through CI and
 # AI review like any other; the person who applied the label is accountable for it.
 # Callers: on issues [labeled].
+# Slack: each opened PR is announced in org var SLACK_AGENT_CHANNEL. Callers opt in with
+#   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+# under `secrets:`; without it (or while the secret is empty) nothing is sent.
 
 on:
   workflow_call:
@@ -22,6 +25,8 @@ on:
         required: true
       KRV_AGENT_PRIVATE_KEY:
         required: true
+      SLACK_BOT_TOKEN:
+        required: false # xoxb; empty = no Slack post
 
 jobs:
   implement:
@@ -88,6 +93,7 @@ jobs:
             and their result, or why you could not), Risk (low/med/high and why), How to revert.
 
       - name: Open PR
+        id: pr
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           N: ${{ github.event.issue.number }}
@@ -118,3 +124,29 @@ jobs:
           gh issue comment "$N" -R "$REPO" --body "🤖 Opened $url"
           gh label create agent:pr-open -R "$REPO" --color 5319e7 --force >/dev/null
           gh issue edit "$N" -R "$REPO" --remove-label agent:go --add-label agent:pr-open
+          { echo "url=$url"; echo "accountable=$accountable"; } >> "$GITHUB_OUTPUT"
+
+      - name: Slack
+        if: steps.pr.outputs.url != ''
+        continue-on-error: true
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          CHANNEL: ${{ vars.SLACK_AGENT_CHANNEL }}
+          URL: ${{ steps.pr.outputs.url }}
+          WHO: ${{ steps.pr.outputs.accountable }}
+          ISSUE: ${{ github.event.issue.html_url }}
+          REF: ${{ github.repository }}#${{ github.event.issue.number }}
+        run: |
+          [ -n "$SLACK_BOT_TOKEN" ] && [ -n "$CHANNEL" ] || exit 0
+          mentions=""
+          for login in ${WHO//,/ }; do
+            email=$(jq -rn --arg l "$login" '{"eigensoup":"stu@krv.ai","sgathrid":"sidney@krv.ai","jeremy-wayland":"jeremy@krv.ai"} | .[$l] // empty')
+            id=""
+            [ -n "$email" ] && id=$(curl -s -G -H "Authorization: Bearer $SLACK_BOT_TOKEN" --data-urlencode "email=$email" \
+              https://slack.com/api/users.lookupByEmail | jq -r '.user.id // empty')
+            if [ -n "$id" ]; then mentions+="<@$id> "; else mentions+="$login "; fi
+          done
+          jq -n --arg c "$CHANNEL" --arg t "🤖 Agent opened <$URL|PR> for <$ISSUE|$REF> — review: $mentions" \
+            '{channel: $c, text: $t, unfurl_links: false}' \
+            | curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" -H 'Content-Type: application/json; charset=utf-8' \
+                --data @- https://slack.com/api/chat.postMessage | jq -r 'if .ok then "posted" else "Slack: \(.error)" end'

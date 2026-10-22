@@ -296,6 +296,8 @@ jobs:
           FINAL: ${{ steps.codex.outputs.final-message }}
           KEY: ${{ secrets.AZURE_FOUNDRY_API_KEY }}
         run: |
+          # An empty answer (e.g. the model was overloaded) must fail, never be reshaped into a "review".
+          [ -n "${FINAL//[[:space:]]/}" ] || { echo "::error::$MODEL returned no review; re-run the job."; exit 1; }
           jq -n --arg final "$FINAL" --arg model "$MODEL" --argjson schema "$SCHEMA" '{
             model: $model, max_tokens: 8000,
             messages: [

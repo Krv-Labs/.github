@@ -13,7 +13,7 @@ on:
     inputs:
       model:
         type: string
-        default: "" # empty = org var KRV_AGENT_MODEL, else gpt-5-mini (set to gpt-5.3-codex or gpt-6.1-sol once quota lands)
+        default: "" # empty = org var KRV_AGENT_MODEL, else gpt-5-mini. gpt-* run on Azure OpenAI; anything else (DeepSeek-V4-Pro) on Foundry
       setup-command:
         type: string
         default: "" # e.g. "pip install -r requirements.txt"; Codex itself has no network
@@ -23,6 +23,8 @@ on:
     secrets:
       AZURE_OPENAI_API_KEY:
         required: true
+      AZURE_FOUNDRY_API_KEY:
+        required: false # krv-ai-foundry-eus2; needed when the model is not gpt-*
       KRV_AGENT_PRIVATE_KEY:
         required: true
       SLACK_BOT_TOKEN:
@@ -34,6 +36,8 @@ jobs:
     runs-on: ubuntu-24.04 # ponytail: codex-action drop-sudo fails on 26.04 (openai/codex-action#188); back to ubuntu-latest once fixed
     permissions:
       contents: read
+    env:
+      MODEL: ${{ inputs.model || vars.KRV_AGENT_MODEL || 'gpt-5-mini' }}
     steps:
       - id: app
         uses: actions/create-github-app-token@v2
@@ -69,10 +73,12 @@ jobs:
       - id: codex
         uses: openai/codex-action@v1
         with:
-          openai-api-key: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          responses-api-endpoint: https://krv-ai-review-eus2.openai.azure.com/openai/v1/responses
-          model: ${{ inputs.model || vars.KRV_AGENT_MODEL || 'gpt-5-mini' }}
-          effort: medium # low over-built on sandbox #5 (string unit parsing)
+          # gpt-* -> Azure OpenAI (krv-ai-review-eus2); other models (DeepSeek) -> Foundry (krv-ai-foundry-eus2).
+          openai-api-key: ${{ startsWith(env.MODEL, 'gpt') && secrets.AZURE_OPENAI_API_KEY || secrets.AZURE_FOUNDRY_API_KEY }}
+          responses-api-endpoint: https://krv-ai-${{ startsWith(env.MODEL, 'gpt') && 'review' || 'foundry' }}-eus2.openai.azure.com/openai/v1/responses
+          model: ${{ env.MODEL }}
+          # low over-built on sandbox #5 (string unit parsing); DeepSeek rejects reasoning.effort.
+          effort: ${{ startsWith(env.MODEL, 'gpt') && 'medium' || '' }}
           permission-profile: ":workspace"
           allow-bot-users: krv-agent[bot] # meeting-todos labels clear tasks agent:go itself
           prompt: |

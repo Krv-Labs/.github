@@ -16,7 +16,7 @@ on:
     inputs:
       model:
         type: string
-        default: "" # empty = org var KRV_REVIEW_MODEL, else gpt-5-mini. gpt-* run on Azure OpenAI; anything else (DeepSeek-V4-Pro) on Foundry
+        default: "" # empty = org var KRV_REVIEW_MODEL (people's PRs) or KRV_AGENT_PR_REVIEW_MODEL (krv-agent PRs), else gpt-5-mini. gpt-* run on Azure OpenAI; others (DeepSeek-V4-Pro) on Foundry
       repo:
         type: string
         default: "" # owner/name; empty = the PR that triggered the caller
@@ -43,8 +43,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    env:
-      MODEL: ${{ inputs.model || vars.KRV_REVIEW_MODEL || 'gpt-5-mini' }}
+    env: # MODEL is exported by the `pr` step (depends on the PR author)
       SCHEMA: |
         {
           "type": "object",
@@ -109,6 +108,9 @@ jobs:
         env:
           REPO_IN: ${{ inputs.repo }}
           PR_IN: ${{ inputs.pr }}
+          MODEL_IN: ${{ inputs.model }}
+          REVIEW_MODEL: ${{ vars.KRV_REVIEW_MODEL || 'gpt-5-mini' }}
+          AGENT_PR_REVIEW_MODEL: ${{ vars.KRV_AGENT_PR_REVIEW_MODEL || 'gpt-5-mini' }}
         with:
           github-token: ${{ steps.app.outputs.token || github.token }}
           script: |
@@ -116,6 +118,9 @@ jobs:
             const [owner, repo] = full.split('/');
             const n = Number(process.env.PR_IN);
             const pr = n ? (await github.rest.pulls.get({ owner, repo, pull_number: n })).data : context.payload.pull_request;
+            // Agent-written PRs get a reviewer from a different model family than the agent (KRV_AGENT_MODEL).
+            const env = process.env;
+            core.exportVariable('MODEL', env.MODEL_IN || (pr.user.login === 'krv-agent[bot]' ? env.AGENT_PR_REVIEW_MODEL : env.REVIEW_MODEL));
             core.setOutput('repo', full);
             core.setOutput('number', pr.number);
             core.setOutput('base', pr.base.sha);

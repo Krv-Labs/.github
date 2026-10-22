@@ -4,7 +4,7 @@ name: 🤖 AI review (reusable)
 # (updated on each push), sets a risk:low|med|high label, and fails when there is
 # an Important finding. Callers: on pull_request [opened, synchronize, reopened,
 # ready_for_review]. Policy: kos "Engineering Review & Ownership Plan".
-# Skips lockfile/generated-only diffs. From round 4 on it re-reviews only the new commits.
+# Skips lockfile/generated-only diffs and krv-agent[bot] PRs (a person reviews those). From round 4 on it re-reviews only the new commits.
 # On demand: pass `repo` + `pr` (from a private repo's workflow_dispatch) to review any org PR;
 # the krv-agent App then reads the PR and posts the comment.
 # Slack: risk:high or an Important finding pings org var SLACK_REVIEW_CHANNEL. Callers opt in with
@@ -35,7 +35,9 @@ on:
 
 jobs:
   review:
-    if: inputs.pr != 0 || github.event.pull_request.draft == false
+    # Agent-written (krv-agent[bot]) PRs are not auto-reviewed: the accountable person reviews them
+    # (decision 2026-10-22; Kimi was unreliable). On-demand reviews (inputs.pr) still run.
+    if: inputs.pr != 0 || (github.event.pull_request.draft == false && github.event.pull_request.user.login != 'krv-agent[bot]')
     runs-on: ubuntu-24.04 # ponytail: codex-action drop-sudo fails on 26.04 (openai/codex-action#188); back to ubuntu-latest once fixed
     concurrency:
       group: ai-review-${{ inputs.repo || github.repository }}-${{ inputs.pr || github.event.pull_request.number }}
@@ -118,7 +120,7 @@ jobs:
             const [owner, repo] = full.split('/');
             const n = Number(process.env.PR_IN);
             const pr = n ? (await github.rest.pulls.get({ owner, repo, pull_number: n })).data : context.payload.pull_request;
-            // Agent-written PRs get a reviewer from a different model family than the agent (KRV_AGENT_MODEL).
+            // Agent-written PRs only get here on demand; use a different model family than the agent (KRV_AGENT_MODEL).
             const env = process.env;
             core.exportVariable('MODEL', env.MODEL_IN || (pr.user.login === 'krv-agent[bot]' ? env.AGENT_PR_REVIEW_MODEL : env.REVIEW_MODEL));
             core.setOutput('repo', full);

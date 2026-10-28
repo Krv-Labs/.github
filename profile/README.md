@@ -1,5 +1,5 @@
 # krv
-> **Clinical Trial Intelligence, grounded in mathematics**
+> **Tunable, private clinical trial intelligence.**
 
 Krv Labs builds models that learn informative representations of patient data, and runs them where that data lives. The goal: help researchers find the right patients, design better trials and generate clinical knowledge without moving sensitive records.
 

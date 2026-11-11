@@ -19,7 +19,7 @@ on:
         default: "" # e.g. "pip install -r requirements.txt"; Codex itself has no network
       node-version:
         type: string
-        default: "" # e.g. "24" for Node repos; corepack then provides the repo's pnpm/yarn
+        default: "" # e.g. "26" for Node repos. Node 25+ ships no corepack: install it in setup-command (npm i -g corepack) before using pnpm/yarn
     secrets:
       AZURE_OPENAI_API_KEY:
         required: true
